@@ -62,7 +62,7 @@ db.once("open", function(){
 POST route, for creating new appliant documents in our database.
 */
 server.post('/', function(req, res, next){
-	var applicant = new Applicant(req.body);
+	var applicant = new Applicants(req.body);
 	idCounter++;
 	applicant.id = idCounter;
 	applicant.save(function(err, question){
@@ -100,7 +100,7 @@ server.get("/applicant/:id", function(req, res, next){
 /*
 PUT - Updating a particular applicant 
 */
-server.put("/applicants/:id", function(req, res, next) {
+server.put("/applicant/:id", function(req, res, next) {
     Applicants.findOne({id: req.params.id}, function(err, applicant) {
         applicant.firstName = req.body.firstName;
         applicant.middleName = req.body.middleName;
@@ -119,6 +119,17 @@ server.put("/applicants/:id", function(req, res, next) {
         //res.send(`You have found applicant ${req.params.id}`);
     });
     return next();
+});
+
+/*
+REMOVE/DELETE
+*/
+server.del("applicant/:id", function(req, res, next){
+	Applicants.findOne({id: req.params.id}, function(err, applicant){
+		applicant.remove();
+		console.log('Applicant removed');
+	});
+	return next();
 });
 /*
 Given a port and a callback function, this will listen on a particular port for a connection.
