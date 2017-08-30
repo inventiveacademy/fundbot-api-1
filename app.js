@@ -8,10 +8,13 @@ Below, we're requiring everything we'll use in our application.
 🐱 Requiring our Applicant schema from Mongoose, see 'models.js'
 */
 let restify = require('restify');
-let server = restify.createServer();
 let jsonParser = require("body-parser").json;
 let mongoose = require("mongoose");
 let Applicant = require("./models").Applicant;
+/*
+returns a server object, by calling the createServer() function
+*/ 
+let server = restify.createServer();
 /*
 🐔 Calling the jsonParser/body-parser
 */
@@ -24,6 +27,8 @@ let db = mongoose.connection;
 /*
 🔔Mongo error handler🔔
 */
+let idCounter = 0;
+
 db.on("error", function(error){
 	console.log(`Oh noes! connection error ${error}`);
 });
@@ -39,20 +44,19 @@ POST route, for creating new appliant documents in our database.
 */
 server.post('/', function(req, res, next){
 	var applicant = new Applicant(req.body);
+	idCounter++;
+	applicant.id = idCounter;
 	applicant.save(function(err, question){
 		if(err) return next(err);
 		res.status(201);
 		res.json(applicant);
 	});
 });
-/*
-GET route, for TESTING. Needs refactoring.
-*/
-server.get('/:name', function(req, res,next){
-	res.send(`Hello, ${req.params.name}`);
-	next();
-});
 
+/*
+Given a port and a callback function, this will listen on a particular port for a connection.
+*/
 server.listen(3001, function(){
 	console.log(`Server listening at port 3001`);
-})
+});
+

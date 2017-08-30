@@ -5,6 +5,7 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 // create an AnswerSchema 
 var ApplicantSchema = new Schema({
+	id: Number,
 	firstName: String,
 	middleName: String,
 	lastName: String,
