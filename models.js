@@ -18,7 +18,7 @@ var ApplicantSchema = new Schema({
 });
 
 // create the model
-var Applicant = mongoose.model("Applicant", ApplicantSchema);
+var Applicants = mongoose.model("Applicants", ApplicantSchema);
 
 // export
-module.exports.Applicant = Applicant;
+module.exports.Applicants = Applicants;

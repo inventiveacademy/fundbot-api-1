@@ -10,7 +10,7 @@ Below, we're requiring everything we'll use in our application.
 let restify = require('restify');
 let jsonParser = require("body-parser").json;
 let mongoose = require("mongoose");
-let Applicant = require("./models").Applicant;
+let Applicants = require("./models").Applicants;
 /*
 returns a server object, by calling the createServer() function
 */ 
@@ -53,6 +53,30 @@ server.post('/', function(req, res, next){
 	});
 });
 
+/*
+GET for all documents
+Applicants refers to the model created in models.js
+*/
+server.get("/", function(req, res, next){
+	Applicants.find({}, function(err, applicants){
+		res.send(applicants);
+	});
+
+})
+/*
+GET - find one
+*/
+
+server.get("/applicant/:id", function(req, res, next){
+	Applicants.findOne({ id: req.params.id}, function(err, applicant){
+	if(applicant === null){
+	// 🚫 TODO: Refactor to use error handling
+		res.send('OH NOES! 😢 User does not exist');
+		return next();
+	}	
+		res.send(applicant);
+	});
+});
 /*
 Given a port and a callback function, this will listen on a particular port for a connection.
 */
