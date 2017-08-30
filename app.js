@@ -11,6 +11,7 @@ let restify = require('restify');
 let jsonParser = require("body-parser").json;
 let mongoose = require("mongoose");
 let Applicants = require("./models").Applicants;
+let plugins = require("restify").plugins;
 /*
 returns a server object, by calling the createServer() function
 */ 
@@ -37,20 +38,23 @@ server.pre(cors.preflight);
 server.use(cors.actual);
 */
 
+server.use(plugins.queryParser()); 
 server.use(jsonParser());
+
 /*
 🙉 Connecting with mongoose to our mlab database
 */
 mongoose.connect('mongodb://scottie.schneider:speje33ma*@ds161493.mlab.com:61493/fundbot-whiterabbit');
 let db = mongoose.connection;
 /*
-🔔Mongo error handler🔔
+🔔 Mongo error handler 🔔
 */
 let idCounter = 0;
 
 db.on("error", function(error){
 	console.log(`Oh noes! connection error ${error}`);
 });
+
 /*
 😎Event listener for mongodb, logging statement on successful connection to the db
 */
@@ -61,6 +65,7 @@ db.once("open", function(){
 /*
 POST route, for creating new appliant documents in our database.
 */
+
 server.post('/', function(req, res, next){
 	var applicant = new Applicants(req.body);
 	idCounter++;
@@ -76,7 +81,7 @@ server.post('/', function(req, res, next){
 GET for all documents
 Applicants refers to the model created in models.js
 */
-server.get("/", function(req, res, next){
+server.get("/applicants", function(req, res, next){
 	Applicants.find({}, function(err, applicants){
 		if(err) return next(err);
 		res.send(applicants);
@@ -97,6 +102,12 @@ server.get("/applicant/:id", function(req, res, next){
 	});
 });
 
+/*
+GET - find one - Query String
+*/
+server.get("/applicants/search", function(req, res, next){
+	console.log(req.query.id);
+})
 /*
 PUT - Updating a particular applicant 
 */
