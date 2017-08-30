@@ -1,24 +1,23 @@
 'use strict';
 // require mongoose
-let mongoose = require("mongoose");
+var mongoose = require("mongoose");
 // store the schema constructor as a local variable
-let Schema = mongoose.Schema;
+var Schema = mongoose.Schema;
 // create an AnswerSchema 
-let AnswerSchema = new Schema({
-	text: String,
-	createdAt: {type: Date, default: Date.now},
-	updatedAt: {type: Date, default: Date.now},
-	votes: {type: Number, default: 0}
-});
-// create a question schema
-let QuestionSchema = new Schema({
-	text: String,
-	createdAt: {type: Date, default: Date.now},
-	answers: [AnswerSchema]
+var ApplicantSchema = new Schema({
+	firstName: String,
+	middleName: String,
+	lastName: String,
+	contactPhone: Number,
+	email: String,
+	address: String,
+	zip: Number,
+	city: String,
+	state: String 
 });
 
 // create the model
-let Question = mongoose.model("Question", QuestionSchema);
+var Applicant = mongoose.model("Applicant", ApplicantSchema);
 
 // export
-module.exports.Question = Question;
+module.exports.Applicant = Applicant;
