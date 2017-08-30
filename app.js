@@ -102,10 +102,16 @@ PUT - Updating a particular applicant
 */
 server.put("/applicants/:id", function(req, res, next) {
     Applicants.findOne({id: req.params.id}, function(err, applicant) {
-        
         applicant.firstName = req.body.firstName;
         applicant.middleName = req.body.middleName;
-       
+       	applicant.lastName = req.body.lastName;
+       	applicant.contactPhone = req.body.contactPhone;
+       	applicant.email = req.body.email;
+       	applicant.address = req.body.address;
+       	applicant.zip = req.body.zip;
+       	applicant.city = req.body.city;
+       	applicant.state = req.body.state;
+
         applicant.save(function(err, question){
 			if(err) return next(err);
 		});
