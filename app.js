@@ -18,6 +18,25 @@ let server = restify.createServer();
 /*
 🐔 Calling the jsonParser/body-parser
 */
+
+/*
+Uses cors middleware
+*/
+/*
+var corsMiddleware = require('restify-cors-middleware');
+
+const cors = corsMiddleware({
+  preflightMaxAge: 5, //Optional
+  //origins: ['http://localhost'],
+  origins: ['*'],
+  allowHeaders: ['API-Token'],
+  exposeHeaders: ['API-Token-Expiry']
+});
+
+server.pre(cors.preflight);
+server.use(cors.actual);
+*/
+
 server.use(jsonParser());
 /*
 🙉 Connecting with mongoose to our mlab database
@@ -59,9 +78,9 @@ Applicants refers to the model created in models.js
 */
 server.get("/", function(req, res, next){
 	Applicants.find({}, function(err, applicants){
+		if(err) return next(err);
 		res.send(applicants);
 	});
-
 })
 /*
 GET - find one
@@ -76,6 +95,24 @@ server.get("/applicant/:id", function(req, res, next){
 	}	
 		res.send(applicant);
 	});
+});
+
+/*
+PUT - Updating a particular applicant 
+*/
+server.put("/applicants/:id", function(req, res, next) {
+    Applicants.findOne({id: req.params.id}, function(err, applicant) {
+        
+        applicant.firstName = req.body.firstName;
+        applicant.middleName = req.body.middleName;
+       
+        applicant.save(function(err, question){
+			if(err) return next(err);
+		});
+		res.send(applicant);
+        //res.send(`You have found applicant ${req.params.id}`);
+    });
+    return next();
 });
 /*
 Given a port and a callback function, this will listen on a particular port for a connection.

@@ -21,6 +21,7 @@
     "body-parser": "^1.17.2",
     "mongoose": "^4.11.9",
     "morgan": "^1.8.2",
-    "restify": "^5.2.0"
+    "restify": "^5.2.0",
+    "restify-cors-middleware": "^1.0.1"
   }
 }
