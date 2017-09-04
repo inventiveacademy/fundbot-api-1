@@ -8,10 +8,10 @@ Below, we're requiring everything we'll use in our application.
 🐱 Requiring our Applicant schema from Mongoose, see 'models.js'
 */
 let restify = require('restify');
-let jsonParser = require("body-parser").json;
 let mongoose = require("mongoose");
 let Applicants = require("./models").Applicants;
 let plugins = require("restify").plugins;
+let session = require('express-session');
 /*
 returns a server object, by calling the createServer() function
 */ 
@@ -19,12 +19,18 @@ let server = restify.createServer();
 /*
 🐔 Calling the jsonParser/body-parser
 */
-
+// Use sessions for tracking logins
+server.use(session({
+	secret: 'scottie loves you',
+	resave: true,
+	saveUninitialized: false
+}));
 /*
 Uses cors middleware
 */
-/*
+
 var corsMiddleware = require('restify-cors-middleware');
+// *** To get started type corsproxy in the terminal
 
 const cors = corsMiddleware({
   preflightMaxAge: 5, //Optional
@@ -36,10 +42,10 @@ const cors = corsMiddleware({
 
 server.pre(cors.preflight);
 server.use(cors.actual);
-*/
+
 
 server.use(plugins.queryParser()); 
-server.use(jsonParser());
+server.use(plugins.bodyParser());
 
 /*
 🙉 Connecting with mongoose to our mlab database
@@ -62,20 +68,38 @@ db.once("open", function(){
 	console.log('The database connection is successful!');
 });
 
+//register post route for express portal form
+server.post('/', async (req, res, next) => {
+	const applicant = new Applicants(req.body);
+	await applicant.save();
+	console.log(req.body);
+	// We don't have the _id yet... so let's build a method to get it
+	Applicants.idFinder(req.body.email, function(data){
+		console.log(`Working on getting the document ID which is ${data._id}`);
+		req.session.userId = data._id;
+		res.send('success')
+	})
+	//req.session.userId = req.body._id;
+	//res.send('ok');
+})
 /*
-POST route, for creating new appliant documents in our database.
+POST route, user authentication and login.
 */
-
-server.post('/', function(req, res, next){
-	var applicant = new Applicants(req.body);
-	idCounter++;
-	applicant.id = idCounter;
-	applicant.save(function(err, question){
-		if(err) return next(err);
-		res.status(201);
-		res.json(applicant);
+server.post('/login',  (req, res, next) => {
+	console.log(`${req.body.password} ${req.body.email}`);
+	Applicants.authenticate(req.body.email, req.body.password, function(data){
+		console.log(`data is ${data}`);
+		if(data){
+			console.log(`We're in the authenticate function, true ${data._id}`);
+			req.session.userId = data._id;
+			res.send('success');
+		}else{
+			res.statusCode = 403;
+			res.send('not ok');	
+		}
 	});
-});
+
+})
 
 /*
 GET for all documents
@@ -107,7 +131,7 @@ GET - find one - Query String
 */
 server.get("/applicants/search", function(req, res, next){
 	console.log(req.query.id);
-})
+});
 /*
 PUT - Updating a particular applicant 
 */
@@ -142,6 +166,16 @@ server.del("applicant/:id", function(req, res, next){
 	});
 	return next();
 });
+
+// error handler
+// define as the last app.use callback
+server.use(function(err, req, res, next){
+	res.status(err.status || 500);
+	res.render('error', {
+		message: err.message,
+		error: {}
+	})
+})
 /*
 Given a port and a callback function, this will listen on a particular port for a connection.
 */

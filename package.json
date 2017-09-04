@@ -18,11 +18,14 @@
   },
   "homepage": "https://github.com/inventivegroup/fundbot-api-1#readme",
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "body-parser": "^1.17.2",
+    "express-session": "^1.15.5",
     "mongoose": "^4.11.9",
     "morgan": "^1.8.2",
     "query-parser": "0.0.1",
     "restify": "^5.2.0",
-    "restify-cors-middleware": "^1.0.1"
+    "restify-cors-middleware": "^1.0.1",
+    "urlencoded-body-parser": "^2.0.1"
   }
 }
